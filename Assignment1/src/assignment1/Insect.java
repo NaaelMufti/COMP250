@@ -10,7 +10,18 @@ public abstract class Insect
     {
         this.position = pos;
         this.health = hp;
+
+        if (pos != null)
+        {
+            boolean test = pos.addInsect(this);
+            if (test == false)
+            {
+                throw new IllegalArgumentException("Cannot place the insect on this tile. One bee per tile, and a hornet can only be placed on the path.");
+            }
+        }
     }
+
+
 
     public final Tile getPosition()
     {
@@ -26,4 +37,6 @@ public abstract class Insect
     {
         this.position = pos;
     }
+
+
 }

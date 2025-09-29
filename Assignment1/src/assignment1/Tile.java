@@ -1,4 +1,5 @@
 package assignment1;
+
 // Naael Mufti, McGill ID: 261279652
 
 public class Tile
@@ -25,14 +26,14 @@ public class Tile
         this.swarm = null;
     }
 
-    public Tile(boolean isHive, boolean isNest, boolean onThePath, Tile towardTheHive, Tile towardTheNest, int food, HoneyBee bee, SwarmOfHornets swarm)
+    public Tile(int food, boolean isHive, boolean isNest, boolean onThePath, Tile towardTheHive, Tile towardTheNest, HoneyBee bee, SwarmOfHornets swarm)
     {
+        this.food = food;
         this.isHive = isHive;
         this.isNest = isNest;
         this.onThePath = onThePath;
         this.towardTheHive = towardTheHive;
         this.towardTheNest = towardTheNest;
-        this.food = food;
         this.bee = bee;
         this.swarm = swarm;
     }
@@ -139,6 +140,43 @@ public class Tile
         return this.swarm.getHornets(); // shallow copy of the array
     }
 
+    public boolean addInsect (Insect ins)
+    {
+        if (ins instanceof HoneyBee) // cater to HoneyBee first
+        {
+            HoneyBee bee = (HoneyBee) ins; // downcasting
+
+            if(this.isNest == true || this.bee != null)
+            {
+                return false; // cannot place if a hornets nest or if there already is a bee
+            }
+            this.bee = bee;
+            bee.setPosition(this); // update pos of bee
+            return true;
+        }
+        else if (ins instanceof Hornet) // now if its a Hornet
+        {
+            Hornet hornet = (Hornet) ins; // downcasting
+
+            if(this.onThePath == false)
+            {
+                return false;
+            }
+
+            if (this.swarm == null)
+            {
+                this.swarm = new SwarmOfHornets(); // if swarm is null create one
+            }
+
+            this.swarm.addHornet(hornet);
+            hornet.setPosition(this);
+            return true;
+        } else
+        {
+            return false;
+        }
+    }
+
     public boolean removeInsect(Insect ins)
     {
         if (ins == this.bee) // Insect can be a HoneyBee or Swarm of Hornets
@@ -153,6 +191,7 @@ public class Tile
         } else
         return false;
     }
+
 
 
 }

@@ -11,6 +11,7 @@ public abstract class HoneyBee extends Insect // subclass of Insect
         this.cost = cost;
     }
 
+
     public int getCost()
     {
         return cost;
