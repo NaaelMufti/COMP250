@@ -23,7 +23,7 @@ public class AngryBee extends HoneyBee
         }
 
         // if current tile has hornets and not a nest
-        if(this.getPosition().getNumberOfHornets() > 0 && this.getPosition().isNest() == false)
+        if(this.getPosition().getNumOfHornets() > 0 && this.getPosition().isNest() == false)
         {
             Hornet enemy = this.getPosition().getHornet(); // make the hornet an enemy
             enemy.takeDamage(this.attackDamage);
@@ -33,7 +33,7 @@ public class AngryBee extends HoneyBee
         // not on the current tile, so checks the next tile
         if(this.getPosition().towardTheNest() != null && this.getPosition().towardTheNest().isNest() == false) // if next tile isn't null or a nest
         {
-            if (this.getPosition().towardTheNest().getNumberOfHornets() > 0) // not empty
+            if (this.getPosition().towardTheNest().getNumOfHornets() > 0) // not empty
             {
                 Hornet enemy = this.getPosition().towardTheNest().getHornet();
                 enemy.takeDamage(this.attackDamage);

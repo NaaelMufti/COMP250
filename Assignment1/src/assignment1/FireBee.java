@@ -29,7 +29,7 @@ public class FireBee extends HoneyBee
         while (range != null && rangeChecked <= attackRange && range.isNest() == false)
         {
 
-            if (range.isOnFire() == false && range.getNumberOfHornets() > 0) // not on fire and exists
+            if (range.isOnFire() == false && range.getNumOfHornets() > 0) // not on fire and exists
             {
                 range.setOnFire();
                 return true; // set on fire and return true

@@ -109,7 +109,7 @@ public class Tile
         this.food = this.food + amtOfFood;
     }
 
-    public int getNumberOfHornets()
+    public int getNumOfHornets()
     {
         if (this.swarm == null)
         {
