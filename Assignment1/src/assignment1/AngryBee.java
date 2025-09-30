@@ -31,11 +31,11 @@ public class AngryBee extends HoneyBee
         }
 
         // not on the current tile, so checks the next tile
-        if(this.getPosition().towardsTheNest() != null && this.getPosition().towardsTheNest().isNest() == false) // if next tile isn't null or a nest
+        if(this.getPosition().towardTheNest() != null && this.getPosition().towardTheNest().isNest() == false) // if next tile isn't null or a nest
         {
-            if (this.getPosition().towardsTheNest().getNumberOfHornets() > 0) // not empty
+            if (this.getPosition().towardTheNest().getNumberOfHornets() > 0) // not empty
             {
-                Hornet enemy = this.getPosition().towardsTheNest().getHornet();
+                Hornet enemy = this.getPosition().towardTheNest().getHornet();
                 enemy.takeDamage(this.attackDamage);
                 return true; // successful so true
             }

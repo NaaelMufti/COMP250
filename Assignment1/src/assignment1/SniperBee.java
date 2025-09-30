@@ -34,20 +34,20 @@ public class SniperBee extends HoneyBee
         }
 
         int n; // variable to find which is smaller of piercing power and number of hornets
-        if (piercingPower > this.getPosition().towardsTheNest().getNumberOfHornets())
+        if (piercingPower > this.getPosition().towardTheNest().getNumberOfHornets())
         {
             n = piercingPower;
         } else
         {
-            n = this.getPosition().towardsTheNest().getNumberOfHornets();
+            n = this.getPosition().towardTheNest().getNumberOfHornets();
         } // set n to either piercing power or numb of hornets
 
         // now every other turn (turnCount % 2 == 0)
-        while (this.getPosition().towardsTheNest() != null && this.getPosition().towardsTheNest().isNest() == false)
+        while (this.getPosition().towardTheNest() != null && this.getPosition().towardTheNest().isNest() == false)
         {
             for (int i = 0; i < n; i++)
             {
-                Hornet h = this.getPosition().towardsTheNest().getHornets()[i]; // access the array element
+                Hornet h = this.getPosition().towardTheNest().getHornets()[i]; // access the array element
                 h.takeDamage(attackDamage); // the hornet in place i takes damage
             }
         }

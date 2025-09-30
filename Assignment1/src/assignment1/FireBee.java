@@ -24,7 +24,7 @@ public class FireBee extends HoneyBee
         }
 
         int rangeChecked = 1; // how much of its range we've checked so far
-        Tile range = this.getPosition().towardsTheNest(); // doesn't start on its Tile
+        Tile range = this.getPosition().towardTheNest(); // doesn't start on its Tile
 
         while (range != null && rangeChecked <= attackRange && range.isNest() == false)
         {
@@ -36,7 +36,7 @@ public class FireBee extends HoneyBee
             }
 
             // move one more tile over
-            range = range.towardsTheNest();
+            range = range.towardTheNest();
             rangeChecked = rangeChecked + 1;
         }
         // didn't find anything

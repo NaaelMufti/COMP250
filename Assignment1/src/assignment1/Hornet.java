@@ -81,8 +81,4 @@ public class Hornet extends Insect // subclass of Insect
         }
     }
 
-    public static void main(String[] args)
-    {
-
-    }
 }

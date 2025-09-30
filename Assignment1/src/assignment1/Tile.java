@@ -73,7 +73,7 @@ public class Tile
             return this.towardTheHive;
     }
 
-    public Tile towardsTheNest()
+    public Tile towardTheNest()
     {
         if (this.onThePath == false || this.isNest)
         {
