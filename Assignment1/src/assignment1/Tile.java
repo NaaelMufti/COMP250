@@ -1,5 +1,4 @@
 package assignment1;
-
 // Naael Mufti, McGill ID: 261279652
 
 public class Tile
@@ -12,6 +11,8 @@ public class Tile
     private Tile towardTheNest;
     private HoneyBee bee;
     private SwarmOfHornets swarm;
+
+    private boolean onFire;
 
     public Tile()
     {
@@ -50,7 +51,7 @@ public class Tile
 
     public void buildHive()
     {
-        this.isNest = true; // update from false to true
+        this.isHive = true; // update from false to true
     }
 
     public void buildNest()
@@ -150,9 +151,12 @@ public class Tile
             {
                 return false; // cannot place if a hornets nest or if there already is a bee
             }
-            this.bee = bee;
-            bee.setPosition(this); // update pos of bee
-            return true;
+            if(this.isNest == false && this.bee == null)
+            {
+                this.bee = bee;
+                bee.setPosition(this); // update pos of bee
+                return true;
+            }
         }
         else if (ins instanceof Hornet) // now if its a Hornet
         {
@@ -171,11 +175,11 @@ public class Tile
             this.swarm.addHornet(hornet);
             hornet.setPosition(this);
             return true;
-        } else
-        {
-            return false;
         }
+        return false;
     }
+
+
 
     public boolean removeInsect(Insect ins)
     {
@@ -192,6 +196,15 @@ public class Tile
         return false;
     }
 
+    public void setOnFire()
+    {
+        this.onFire = true;
+    }
+
+    public boolean isOnFire()
+    {
+        return this.onFire;
+    }
 
 
 }

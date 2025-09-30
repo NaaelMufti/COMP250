@@ -9,6 +9,8 @@ public class SwarmOfHornets
     private Node head;
     private Node tail;
 
+    public static double QUEEN_BOOST;
+
     private class Node // linked list needs Nodes
     {
         Hornet hornet;
@@ -72,6 +74,19 @@ public class SwarmOfHornets
             tail = tail.next;
         }
         numOfHornets = numOfHornets + 1;
+
+        if (n.isTheQueen())
+        {
+            Node temp = head;
+            while (temp != null) // iterate through
+            {
+                if (temp.hornet != n) // not the queen herself
+                {
+                    temp.hornet.regenerateHealth(QUEEN_BOOST);
+                }
+                temp = temp.next;
+            }
+        }
     }
 
     public boolean removeHornet(Hornet n)
