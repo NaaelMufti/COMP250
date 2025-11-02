@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class Strings
 {
 
@@ -29,6 +31,14 @@ public class Strings
         return freq;
     }
 
+    public static void mystery(int[][] x, int[] y)
+    {
+        x[0] = new int[2];
+        y[0] = x[1][0];
+        x[0][1] = y[1];
+        x[1] = y;
+    }
+
     public static void main(String[] args)
     {
         String s = "pumpkinpie";
@@ -42,5 +52,25 @@ public class Strings
         System.out.println(frequency[4]);
         System.out.println(frequency[8]);
         System.out.println(frequency[10]);
+        System.out.println("break");
+
+        int[][] a = {{1,2,3},{4,5}};
+        mystery(a, a[0]);
+        System.out.println(Arrays.deepToString(a));
+
+        System.out.println("break");
+
+        String[] names = new String[2];
+        names[1] = "Will";
+        String c = names[1];
+        names[0] = c;
+        c = "Giulia";
+        String b = "Emma";
+        names[1] = b;
+        b = "Will";
+
+        System.out.println(Arrays.deepToString(names));
+
+
     }
 }
