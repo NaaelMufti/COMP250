@@ -103,48 +103,42 @@ public class Caterpillar
         return ps;
     }
 
-
-    // shift all Segments to the previous Position while maintaining the old color
-    // the length of the caterpillar is not affected by this
     public void move(Position p)
     {
-        if(Position.getDistance(this.getHeadPosition(),p) != 1) // If not orthogonal
+        if (Position.getDistance(this.getHeadPosition(), p) != 1)
         {
             throw new IllegalArgumentException("Error: Caterpillar can only move 1 tile orthogonally to the head.");
         }
 
-        if (this.stage == EvolutionStage.ENTANGLED) // if entangled can't move
+        if (this.stage == EvolutionStage.ENTANGLED) // cant do anything
         {
             throw new IllegalArgumentException("Error: Caterpillar is Entangled, game over.");
         }
 
-        Segment collCheck = this.head; // collision
-        while(collCheck != null)
+        for (Segment collCheck = this.head; collCheck != null; collCheck = collCheck.next) // check collision
         {
-            if(collCheck.position.equals(p)) // if p is part of caterpillar
+            if (collCheck.position.equals(p))
             {
                 this.stage = EvolutionStage.ENTANGLED;
-                return; // exit (void method)
+                return;
             }
-            collCheck = collCheck.next;
         }
 
+        this.positionsPreviouslyOccupied.push(new Position(this.head.position)); // old head changes position first
 
-        Position prev = new Position(getHeadPosition()); // shift all elements up
+        Position prev = new Position(this.head.position);
         Segment cur = this.head.next;
-        while(cur != null)
-        {
+        while (cur != null) {
             Position temp = new Position(cur.position);
             cur.position = prev;
             prev = temp;
             cur = cur.next;
         }
-        this.head.position = new Position(p); // update head to new position
-        this.positionsPreviouslyOccupied.push(new Position(getHeadPosition()));
 
-        // check for cake (last question)
-        if(this.stage ==EvolutionStage.GROWING_STAGE && this.turnsNeededToDigest > 0)
-        {
+        this.head.position = new Position(p); // change new head
+
+        // digestion handling (cake question)
+        if (this.stage == EvolutionStage.GROWING_STAGE && this.turnsNeededToDigest > 0) {
             Color newColour = GameColors.SEGMENT_COLORS[randNumGenerator.nextInt(5)];
             Segment newSeg = new Segment(new Position(this.tail.position), newColour);
             this.tail.next = newSeg;
@@ -153,15 +147,12 @@ public class Caterpillar
             this.turnsNeededToDigest--;
 
             if (this.length >= this.goal)
-            {
                 this.stage = EvolutionStage.BUTTERFLY;
-            }
-        }
-        else if (this.stage == EvolutionStage.GROWING_STAGE && this.turnsNeededToDigest == 0)
-        {
+        } else if (this.stage == EvolutionStage.GROWING_STAGE && this.turnsNeededToDigest == 0) {
             this.stage = EvolutionStage.FEEDING_STAGE;
         }
     }
+
 
 
 
@@ -169,7 +160,7 @@ public class Caterpillar
     public void eat(Fruit f)
     {
         Position newSegPos = this.positionsPreviouslyOccupied.pop(); // from MyStack
-        Segment newSeg = new Segment(newSegPos, f.getColor()); // new segment w color of fruit
+        Segment newSeg = new Segment(newSegPos, f.getColor()); // new segment with color of fruit
         this.tail.next = newSeg;
         this.tail = newSeg;
         this.length++; // update relevant fields
@@ -180,48 +171,26 @@ public class Caterpillar
         }
     }
 
-    // the caterpillar moves one step backwards because of sourness
+    // the caterpillar moves one step backwards because of sournes
     public void eat(Pickle p)
     {
-        if (this.positionsPreviouslyOccupied.empty()) {
-            return;
+        if (this.length < 2) return; // only 1 seg
+
+        Position[] oldPositions = this.getPositions(); // copy the positions
+
+        Segment cur = this.head;  // move the head
+        for (int i = 1; i < oldPositions.length; i++)
+        {
+            cur.position = new Position(oldPositions[i]);
+            cur = cur.next;
         }
 
-        // Move one step backward (head goes to last previously occupied position)
-        Position backStep = this.positionsPreviouslyOccupied.pop();
-
-        // Shift body positions accordingly
-        Position prev = new Position(this.head.position);
-        this.head.position = backStep;
-
-        Segment cur = this.head.next;
-        while (cur != null)
+        if (!positionsPreviouslyOccupied.empty()) // move the tail
         {
-            Position temp = new Position(cur.position);
-            cur.position = prev;
-            prev = temp;
-            cur = cur.next;
+            this.tail.position = this.positionsPreviouslyOccupied.pop();
         }
     }
 
-
-    /*
-  Position prevPos = this.positionsPreviouslyOccupied.pop(); // position to move head to
-        Segment newSeg = this.head;
-        Position tempPrev;
-        while (newSeg != null) {
-            tempPrev = newSeg.position;
-            newSeg.position = prevPos;
-            prevPos = tempPrev;
-            newSeg = newSeg.next;
-        }
-     */
-
-    //for (int i = 0; i < this.getLength(); i++)
-    //        {
-    //            newSeg.position = oldPositions[i-1]; // make prev position
-    //            newSeg = newSeg.next;
-    //        }
 
     // all the caterpillar's colors shuffle around
     public void eat(Lollipop lolly)
