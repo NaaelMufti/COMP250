@@ -39,6 +39,21 @@ public class Strings
         x[1] = y;
     }
 
+    public static String atbashCipher (String text)
+    {
+        String encrypted = "";
+        for (int i=0; i<text.length (); i++)
+        {
+            char c = text.charAt(i);
+            if (c >= 'a' && c <= 'z')
+            {
+                c = (char) ('z' - (c - 'a'));
+            }
+            encrypted = encrypted + c;
+        }
+        return encrypted;
+    }
+
     public static void main(String[] args)
     {
         String s = "pumpkinpie";
@@ -70,6 +85,31 @@ public class Strings
         b = "Will";
 
         System.out.println(Arrays.deepToString(names));
+
+        System.out.println("----------------------");
+
+        String encrypted = "";
+        char c1 = 'c';
+        encrypted = encrypted + c1;
+        System.out.println(encrypted);
+
+        System.out.println("----------------------");
+
+        String b1 = "Will";
+        String b2 = "Johnny";
+        char f = 'f';
+        System.out.println(b1);
+        System.out.println(b2);
+        b2 = b1;
+        b2 = b2 + f;
+        System.out.println("b2: " + b2);
+        System.out.println("b1: " + b1);
+
+        System.out.println("----------------------");
+        String str = "friends don’t lie!";
+        System.out.println(atbashCipher(str));
+
+
 
 
     }

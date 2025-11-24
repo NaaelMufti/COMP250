@@ -9,6 +9,7 @@ public class Midterm1
 
     public static void main(String[] args)
     {
+
         System.out.println(isCorrect(0.707));
         double a = 2.0;
         double b = 2.00;
@@ -19,5 +20,11 @@ public class Midterm1
         {
             System.out.println("false");
         }
+
+
+        int x = 5;
+        System.out.println(2*x++);
+        System.out.println(x);
+
     }
 }
