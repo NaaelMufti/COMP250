@@ -22,37 +22,22 @@ public class Catfeinated implements Iterable<Cat> {
     // New CatNode objects, but same Cat objects
     public Catfeinated(Catfeinated cafe)
     {
-        if (cafe.root == null)
-            this.root = null;
-        else
-        {
-            this.root = copyTree(cafe.root);
-        }
+        this.root = copyNode(cafe.root);
     }
 
     // helper method to recursively copy the tree
-    private CatNode copyTree(CatNode node)
-    {
+    private CatNode copyNode(CatNode node) {
         if (node == null)
-        {
-            return null; // base case
-        }
-
-        // create new node with same Cat object (shallow copy)
+            return null;
         CatNode newNode = new CatNode(node.catEmployee);
-
-        // recursively copy
-        newNode.senior = copyTree(node.senior);
-        newNode.junior = copyTree(node.junior);
-
-        // set parent pointers
-        if (newNode.senior != null) {
-            newNode.senior.parent = newNode;
-        }
-        if (newNode.junior != null) {
+        newNode.junior = copyNode(node.junior);
+        if (newNode.junior != null)
             newNode.junior.parent = newNode;
-        }
 
+        newNode.senior = copyNode(node.senior);
+
+        if (newNode.senior != null)
+            newNode.senior.parent = newNode;
         return newNode;
     }
 
@@ -87,108 +72,40 @@ public class Catfeinated implements Iterable<Cat> {
         return root.findMostJunior();
     }
 
+    // private helper function
+    private void add(ArrayList<CatNode> extra, CatNode node) {
+        int i = 0;
+        while(i < extra.size() && extra.get(i).catEmployee.getFurThickness() > node.catEmployee.getFurThickness() ) i++;
+        extra.add(i, node);
+    }
+
     // returns a list of cats containing the top numOfCatsToHonor cats
     // in the cafe with the thickest fur. Cats are sorted in descending
     // order based on their fur thickness.
-    public ArrayList<Cat> buildHallOfFame(int numOfCatsToHonor) {
-        ArrayList<Cat> allCats = new ArrayList<Cat>();
-        ArrayList<Cat> hallOfFame = new ArrayList<Cat>();
+    public ArrayList<Cat> buildHallOfFame(int numOfCatsToHonor)
+    {
+        ArrayList<Cat> hallOfFame = new ArrayList<>();
+        ArrayList<CatNode> extra = new ArrayList<>(); // This keeps CatNode with thickest fur at index 0
+        extra.add(root);
+        while(!extra.isEmpty() && hallOfFame.size() < numOfCatsToHonor) {
+            CatNode node =  extra.removeFirst();
+            hallOfFame.add(node.catEmployee);
 
-        if (root == null || numOfCatsToHonor == 0)
-            return hallOfFame;
 
-        collectAllCats(root,allCats);
-
-        if(allCats.size() > 1)
-            mergeSort(allCats, 0, allCats.size() -1);
-
-        int limit;
-        if (numOfCatsToHonor < allCats.size())
-            limit = numOfCatsToHonor;
-        else
-            limit = allCats.size();
-        for (int i = 0; i < limit; i++)
-        {
-            hallOfFame.add(allCats.get(i));
+            if(node.junior != null) add(extra, node.junior);
+            if(node.senior != null) add(extra, node.senior);
         }
         return hallOfFame;
     }
 
-    //helper method
-    private void collectAllCats(CatNode node, ArrayList<Cat> cats) {
-        if (node == null)
-        {
-            return;
-        }
-        cats.add(node.catEmployee);
-        collectAllCats(node.senior, cats);
-        collectAllCats(node.junior, cats);
-    }
-
-    //helper mergesort method
-    private void mergeSort(ArrayList<Cat> cats, int left, int right) {
-        if (left < right) {
-            int mid = (left + right) / 2;
-            mergeSort(cats, left, mid);
-            mergeSort(cats, mid + 1, right);
-            merge(cats, left, mid, right);
-        }
-    }
-
-    // merge helper - merges in descending order
-    private void merge(ArrayList<Cat> cats, int left, int mid, int right) {
-        ArrayList<Cat> temp = new ArrayList<>();
-        int i = left, j = mid + 1;
-
-        // merge in descending order (thickest fur first)
-        while (i <= mid && j <= right) {
-            if (cats.get(i).getFurThickness() >= cats.get(j).getFurThickness()) {
-                temp.add(cats.get(i));
-                i++;
-            } else {
-                temp.add(cats.get(j));
-                j++;
-            }
-        }
-        // add remaining elements from each half
-        while (i <= mid) {
-            temp.add(cats.get(i));
-            i++;
-        }
-        while (j <= right) {
-            temp.add(cats.get(j));
-            j++;
-        }
-
-        // copy sorted elements back to original list
-        for (int k = 0; k < temp.size(); k++) {
-            cats.set(left + k, temp.get(k));
-        }
-    }
-
     // Returns the expected grooming cost the cafe has to incur in the next numDays days
-    public double budgetGroomingExpenses(int numDays)
-    {
-        if (root == null)
-            return 0.0; // no expenses
-        return budgetGroomingHelper(root, numDays);
-    }
-
-    private double budgetGroomingHelper(CatNode root, int numDays)
-    {
-        if (root == null)
-            return 0.0;
-
-        double totalCost = 0.0;
-
-        if (root.catEmployee.getDaysToNextGrooming() <= numDays) // if needs grooming within the next days
+    public double budgetGroomingExpenses(int numDays) {
+        double groomingExpenses = 0.0;
+        for(Cat cur : this)
         {
-            totalCost = totalCost + root.catEmployee.getExpectedGroomingCost();
+            if(cur.getDaysToNextGrooming() <= numDays) groomingExpenses += cur.getExpectedGroomingCost();
         }
-        totalCost = budgetGroomingHelper(root.senior, numDays);
-        totalCost = budgetGroomingHelper(root.junior, numDays);
-
-        return totalCost;
+        return groomingExpenses;
     }
 
     // returns a list of list of Cats.
@@ -223,31 +140,7 @@ public class Catfeinated implements Iterable<Cat> {
 
         return schedule;
 
-        /*
-        int maxWeeks = 0;
-        for (int i = 0; i < allCats.size(); i++)
-        {
-            int weeks = (allCats.get(i).getDaysToNextGrooming())/7; // 7 days in a week
-            if (weeks > maxWeeks)
-            {
-                maxWeeks = weeks;
-            }
-        }
 
-        for (int i = 0; i<= maxWeeks; i++)
-        {
-            schedule.add(new ArrayList<>()); // next ArrayList added
-        }
-
-        for (int i = 0; i < allCats.size(); i ++)
-        {
-            Cat cat = allCats.get(i);
-            int weekIndex = (cat.getDaysToNextGrooming())/7;
-            schedule.get(weekIndex).add(cat);
-        }
-        return schedule;
-
-         */
     }
 
 
@@ -270,108 +163,147 @@ public class Catfeinated implements Iterable<Cat> {
         }
 
         // add the c to the tree rooted at this and returns the root of the resulting tree
-        public CatNode hire (Cat c) {
-            int comparison = c.compareTo(this.catEmployee);
-
-            if (comparison > 0) { // c is more senior (smaller monthHired)
-                if (this.senior == null) {
-                    this.senior = new CatNode(c);
-                    this.senior.parent = this;
-                } else {
-                    this.senior = this.senior.hire(c); // call again
-                }
-            } else {
+        public CatNode hire(Cat c) {
+            // BST insert
+            if (c.compareTo(this.catEmployee) < 0) { // junior
                 if (this.junior == null) {
                     this.junior = new CatNode(c);
                     this.junior.parent = this;
                 } else {
-                    this.junior = this.junior.hire(c); // call again
+                    this.junior = this.junior.hire(c);
                 }
-            }
 
-            // now account for the heap
-            CatNode maxFurCat = null;
-            if (this.senior != null && this.junior != null)
-            {
-                if (this.senior.catEmployee.getFurThickness() >= this.junior.catEmployee.getFurThickness()) {
-                    maxFurCat = this.senior;
+
+                if (this.junior.catEmployee.getFurThickness() > this.catEmployee.getFurThickness()) // upheap
+                {
+                    return rightRotate(this);
+                } // else more senior
+            } else {
+                if (this.senior == null) {
+                    this.senior = new CatNode(c);
+                    this.senior.parent = this;
                 } else {
-                    maxFurCat = this.junior;
+                    this.senior = this.senior.hire(c);
                 }
-            } else if (this.senior != null)
-                maxFurCat = this.senior;
-            else if (this.junior != null)
-                maxFurCat = this.junior;
 
-            if(maxFurCat != null && maxFurCat.catEmployee.getFurThickness() > this.catEmployee.getFurThickness())
-            {
-                if (maxFurCat == this.senior)
-                    return rightRotate();
-                else
-                    return leftRotate();
+                if (this.senior.catEmployee.getFurThickness() > this.catEmployee.getFurThickness()) //upheap
+                {
+                    return leftRotate(this);
+                }
             }
-
             return this;
         }
 
+
         // Right rotation: senior child becomes parent
-        private CatNode rightRotate()
-        {
-            CatNode newRoot = this.senior;
-            this.senior = newRoot.junior;
-
-            // Update parent pointers
-            if (this.senior != null) {
-                this.senior.parent = this;
-            }
-
-            newRoot.junior = this;
-            newRoot.parent = this.parent;
-            this.parent = newRoot;
-
-            return newRoot;
+        private CatNode rightRotate(CatNode parent) {
+            CatNode child = parent.junior;
+            parent.junior = child.senior;
+            if (child.senior != null) child.senior.parent = parent;
+            child.senior = parent;
+            child.parent = parent.parent;
+            parent.parent = child;
+            return child;
         }
 
-        // Left rotation: junior child becomes parent
-        private CatNode leftRotate()
-        {
-            CatNode newRoot = this.junior;
-            this.junior = newRoot.senior;
 
-            // Update parent pointers
-            if (this.junior != null) {
-                this.junior.parent = this;
-            }
-
-            newRoot.senior = this;
-            newRoot.parent = this.parent;
-            this.parent = newRoot;
-
-            return newRoot;
+        private CatNode leftRotate(CatNode parent) {
+            CatNode child = parent.senior;
+            parent.senior = child.junior;
+            if (child.junior != null) child.junior.parent = parent;
+            child.junior = parent;
+            child.parent = parent.parent;
+            parent.parent = child;
+            return child;
         }
+
         // remove c from the tree rooted at this and returns the root of the resulting tree
         public CatNode retire(Cat c) {
-            /*
-             * TODO: ADD YOUR CODE HERE
-             */
-            return null;
+            if (c.equals(this.catEmployee)) {
+                // Case 1: leaf or single child
+                if (junior == null && senior == null) return null;
+                if (junior == null) {
+                    senior.parent = parent;
+                    return senior;
+                }
+                if (senior == null) {
+                    junior.parent = parent;
+                    return junior;
+                }
+
+
+                // Case 2: both children
+                CatNode seniorCat = junior.findMostSeniorNode(); // always go right
+                this.catEmployee = seniorCat.catEmployee;
+                // remove from left subtree
+                junior = junior.retire(seniorCat.catEmployee);
+            } else if (c.compareTo(this.catEmployee) < 0) { // more junior
+                if (junior != null) junior = junior.retire(c);
+            } else { // more senior
+                if (senior != null) senior = senior.retire(c);
+            }
+
+            // now we downheap to fix
+            return downheap(this);
         }
 
+        //helper method
+        private CatNode findMostSeniorNode()  {
+            CatNode mostSeniorNode = this;
+            while(mostSeniorNode.senior != null) {
+                mostSeniorNode = mostSeniorNode.senior;
+            }
+            return mostSeniorNode;
+        }
+
+        private CatNode downheap(CatNode node) {
+            if (node == null) return null;
+
+            CatNode maxFurChild = null;
+
+            if (node.junior != null && node.senior != null)
+            {
+                if (node.junior.catEmployee.getFurThickness() >= node.senior.catEmployee.getFurThickness())
+                {
+                    maxFurChild = node.junior;
+                } else
+                {
+                    maxFurChild = node.senior;
+                }
+            } else if (node.junior != null)
+            {
+                maxFurChild = node.junior;
+            } else if (node.senior != null)
+            {
+                maxFurChild = node.senior;
+            } else
+            {
+                return node;
+            }
+
+            if (maxFurChild.catEmployee.getFurThickness() > node.catEmployee.getFurThickness())
+            {
+                if (maxFurChild == node.junior) return rightRotate(node); // rotate
+                else return leftRotate(node);
+            }
+
+            return node;
+        }
+
+
         // find the cat with highest seniority in the tree rooted at this
-        public Cat findMostSenior()
-        {
-            if(this.senior == null)
-                return this.catEmployee;
-            return this.findMostSenior();
+        public Cat findMostSenior() {
+            return findMostSeniorNode().catEmployee; // can use our helper method
         }
 
         // find the cat with lowest seniority in the tree rooted at this
-        public Cat findMostJunior()
-        {
-            if (this.junior == null)
-                return this.catEmployee;
-            return this.findMostJunior();
+        public Cat findMostJunior() { // go left until we can't anymore
+            CatNode mostJuniorNode = this;
+            while(mostJuniorNode.junior != null)
+                mostJuniorNode = mostJuniorNode.junior;
+            return mostJuniorNode.catEmployee;
         }
+
 
         // Feel free to modify the toString() method if you'd like to see something else displayed.
         public String toString() {
